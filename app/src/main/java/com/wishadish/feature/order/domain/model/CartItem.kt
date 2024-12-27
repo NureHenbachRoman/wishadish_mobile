@@ -1,4 +1,4 @@
-package com.wishadish.order.domain.model
+package com.wishadish.feature.order.domain.model
 
 data class CartItem(
     val dish: Dish,

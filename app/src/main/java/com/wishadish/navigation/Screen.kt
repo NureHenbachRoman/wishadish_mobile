@@ -13,5 +13,8 @@ sealed interface Screen {
     data object ProfileScreen
 
     @Serializable
-    data class VerificationScreen(val email: String)
+    data object OrderScreen
+
+    @Serializable
+    data object CartScreen
 }

@@ -1,9 +1,10 @@
-package com.wishadish.order.domain.repository
+package com.wishadish.feature.order.domain.repository
 
-import com.wishadish.order.domain.model.Dish
+import com.wishadish.feature.order.domain.model.Dish
+import com.wishadish.feature.order.domain.model.Order
 
 interface OrderRepository {
-    fun getDishes(): List<Dish>
-    fun getDishesByCategory(category: String): List<Dish>
-    fun getAllCategories(): List<String>
+    suspend fun getDishes(): List<Dish>
+
+    suspend fun placeOrder(order: Order, token: String)
 }

@@ -1,7 +1,7 @@
-package com.wishadish.order.domain.model
+package com.wishadish.feature.order.domain.model
 
 data class Dish(
-    val id: String,
+    val dishId: Int,
     val name: String,
     val description: String,
     val price: Double,

@@ -1,7 +1,7 @@
-package com.wishadish.auth.domain.repository
+package com.wishadish.feature.auth.domain.repository
 
-import com.wishadish.auth.data.remote.AuthApiService
-import com.wishadish.auth.domain.model.User
+import com.wishadish.feature.auth.data.remote.AuthApiService
+import com.wishadish.feature.auth.domain.model.User
 import com.wishadish.network.RetrofitClient
 
 class AuthRepository {

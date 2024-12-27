@@ -1,4 +1,4 @@
-package com.wishadish.auth.domain.model
+package com.wishadish.feature.auth.domain.model
 
 data class User (
     val token: String,

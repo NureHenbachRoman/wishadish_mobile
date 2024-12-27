@@ -8,17 +8,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import com.google.firebase.Firebase
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.auth
-import com.wishadish.auth.data.GoogleAuthClient
-import com.wishadish.auth.domain.model.User
-import com.wishadish.auth.domain.repository.AuthRepository
-import com.wishadish.auth.presentation.LoginScreen
-import com.wishadish.auth.presentation.ProfileScreen
-import com.wishadish.auth.presentation.SignUpScreen
-import com.wishadish.auth.presentation.VerificationScreen
+import com.wishadish.feature.auth.data.GoogleAuthClient
+import com.wishadish.feature.auth.domain.model.User
+import com.wishadish.feature.auth.domain.repository.AuthRepository
+import com.wishadish.feature.auth.presentation.LoginScreen
+import com.wishadish.feature.auth.presentation.ProfileScreen
+import com.wishadish.feature.auth.presentation.SignUpScreen
+import com.wishadish.feature.order.data.remote.RemoteOrderRepository
+import com.wishadish.feature.order.presentation.CartCheckoutScreen
+import com.wishadish.feature.order.presentation.OrderScreen
+import com.wishadish.feature.order.presentation.OrderViewModel
 import com.wishadish.navigation.Screen
 import com.wishadish.ui.theme.WishADishTheme
 import kotlinx.coroutines.launch
@@ -34,9 +36,10 @@ class MainActivity : ComponentActivity() {
                 val auth = Firebase.auth
                 val googleAuth = GoogleAuthClient(context = this)
                 val authRepository = AuthRepository()
+                val orderViewModel = OrderViewModel(RemoteOrderRepository())
                 NavHost(
                     navController = navController,
-                    startDestination = if (!googleAuth.isSingedIn()) Screen.LoginScreen else Screen.ProfileScreen
+                    startDestination = Screen.OrderScreen
                 ) {
                     composable<Screen.LoginScreen> {
 
@@ -45,7 +48,7 @@ class MainActivity : ComponentActivity() {
                                              password: String ->
                                 auth.signInWithEmailAndPassword(email.trim(), password.trim())
                                     .addOnSuccessListener {
-                                        navController.navigate(Screen.ProfileScreen)
+                                        navController.navigate(Screen.OrderScreen)
                                     }
                             },
                             onSignUpClick = {
@@ -77,7 +80,7 @@ class MainActivity : ComponentActivity() {
                                                 role = "client"
                                             )
                                         )
-                                        navController.navigate(Screen.ProfileScreen)
+                                        navController.navigate(Screen.OrderScreen)
                                     }
                                 }
                             },
@@ -87,7 +90,7 @@ class MainActivity : ComponentActivity() {
                                         if (it.isSuccessful) {
                                             Toast.makeText(
                                                 applicationContext,
-                                                "Email is sent to $email",
+                                                "Email was sent to $email",
                                                 Toast.LENGTH_LONG
                                             ).show()
                                         } else {
@@ -123,7 +126,7 @@ class MainActivity : ComponentActivity() {
                                             )
                                         )
                                     }
-                                    navController.navigate(Screen.ProfileScreen)
+                                    navController.navigate(Screen.OrderScreen)
                                 }
                                 else if (user == null) {
                                     auth.createUserWithEmailAndPassword(email.trim(), password.trim())
@@ -160,29 +163,59 @@ class MainActivity : ComponentActivity() {
                             onSignOutClick = {
                                 lifecycleScope.launch {
                                     googleAuth.signOut()
+                                    Toast.makeText(
+                                        applicationContext,
+                                        "Signed out.",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    navController.navigate(Screen.OrderScreen)
+                                }
+                            }
+                        )
+                    }
+                    composable<Screen.OrderScreen> {
+                        OrderScreen(
+                            viewModel = orderViewModel,
+                            onViewCartClick = {
+                                navController.navigate(Screen.CartScreen)
+                            },
+                            onProfileClick = {
+                                if (googleAuth.isSingedIn()) {
+                                    navController.navigate(Screen.ProfileScreen)
+                                } else {
+                                    Toast.makeText(
+                                        applicationContext,
+                                        "You are not logged in",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                     navController.navigate(Screen.LoginScreen)
                                 }
                             }
                         )
                     }
-                    composable<Screen.VerificationScreen> {
-                        val verificationScreen = it.toRoute<Screen.VerificationScreen>()
-
-                        VerificationScreen(
-                            email = verificationScreen.email,
-                            onVerifiedClick = {
-                                val user = auth.currentUser
-                                if (user != null && user.isEmailVerified){
-                                    navController.popBackStack()
-                                    navController.navigate(Screen.ProfileScreen)
-                                }
-                                else {
+                    composable<Screen.CartScreen> {
+                        CartCheckoutScreen(
+                            viewModel = orderViewModel,
+                            onPlaceOrderClick = {
+                                if (!googleAuth.isSingedIn()) {
                                     Toast.makeText(
                                         applicationContext,
-                                        "Seems like your email is not verified",
-                                        Toast.LENGTH_LONG)
-                                        .show()
+                                        "Please login to place an order",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    navController.navigate(Screen.LoginScreen)
+                                    return@CartCheckoutScreen false
                                 }
+                                return@CartCheckoutScreen true
+                            },
+                            onOrderPlaced = {
+                                Toast.makeText(
+                                    applicationContext,
+                                    "Order Placed!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                orderViewModel.cartItems.clear()
+                                navController.navigate(Screen.OrderScreen)
                             }
                         )
                     }

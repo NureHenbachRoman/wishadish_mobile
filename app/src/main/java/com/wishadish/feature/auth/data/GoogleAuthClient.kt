@@ -1,4 +1,4 @@
-package com.wishadish.auth.data
+package com.wishadish.feature.auth.data
 
 import android.content.Context
 import androidx.credentials.ClearCredentialStateRequest

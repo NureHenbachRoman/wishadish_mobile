@@ -1,6 +1,6 @@
-package com.wishadish.auth.data.remote
+package com.wishadish.feature.auth.data.remote
 
-import com.wishadish.auth.domain.model.User
+import com.wishadish.feature.auth.domain.model.User
 import retrofit2.http.Body
 import retrofit2.http.POST
 

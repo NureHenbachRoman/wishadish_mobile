@@ -1,4 +1,4 @@
-package com.wishadish.auth.presentation
+package com.wishadish.feature.auth.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
