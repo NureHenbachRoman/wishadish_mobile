@@ -43,17 +43,7 @@ class OrderViewModel(private val repository: OrderRepository) : ViewModel() {
 
     suspend fun fetchDishes() {
         try {
-            allDishes = repository.getDishes().map { dto ->
-                Dish(
-                    dishId = dto.dishId,
-                    name = dto.name,
-                    description = dto.description,
-                    price = dto.price,
-                    imageUrl = dto.imageUrl,
-                    category = dto.category,
-                    isFavourite = mutableStateOf(dto.isFavourite ?: false)
-                )
-            }
+            allDishes = repository.getDishes()
             displayedDishes = allDishes
             println("NOT EXCEPTION BLABLA")
             println(allDishes)
@@ -124,26 +114,6 @@ class OrderViewModel(private val repository: OrderRepository) : ViewModel() {
             updateCartItem(cartItem, updatedCartItem)
         } else {
             cartItems.remove(cartItem)
-        }
-    }
-
-    fun toggleFavourite(dish: Dish) {
-        if (dish.isFavourite.value!!)
-            removeFromFavourites(dish)
-        else
-            addToFavourites(dish)
-    }
-    private fun addToFavourites(dish: Dish) {
-        dish.isFavourite.value = true
-        viewModelScope.launch {
-            repository.addToFavourites(dish, Firebase.auth.currentUser?.getIdToken(false)?.await()?.token!!)
-        }
-    }
-
-    private fun removeFromFavourites(dish: Dish) {
-        dish.isFavourite.value = false
-        viewModelScope.launch {
-            repository.removeFromFavourites(dish, Firebase.auth.currentUser?.getIdToken(false)?.await()?.token!!)
         }
     }
 
