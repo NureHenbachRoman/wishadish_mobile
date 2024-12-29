@@ -1,13 +1,14 @@
 package com.wishadish.feature.order.data.remote
 
-import com.wishadish.feature.order.domain.model.Dish
 import com.wishadish.feature.order.domain.model.DishDto
+import com.wishadish.feature.order.domain.model.DishIdCarrier
 import com.wishadish.feature.order.domain.model.Order
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface OrderApi {
     @GET("dishes")
@@ -26,13 +27,13 @@ interface OrderApi {
 
     @POST("favourites")
     suspend fun addToFavourites(
-        @Body dishId: Int,
+        @Body dishId: DishIdCarrier,
         @Header("token") token: String
     )
 
     @DELETE("favourites")
     suspend fun removeFromFavourites(
-        @Body dishId: Int,
+        @Query("dishId") dishId: Int,
         @Header("token") token: String
     )
 }

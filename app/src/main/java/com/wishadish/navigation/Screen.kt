@@ -17,4 +17,7 @@ sealed interface Screen {
 
     @Serializable
     data object CartScreen
+
+    @Serializable
+    data object FavouritesScreen
 }

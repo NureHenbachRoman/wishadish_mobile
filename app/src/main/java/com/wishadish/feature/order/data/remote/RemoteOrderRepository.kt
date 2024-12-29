@@ -2,6 +2,7 @@ package com.wishadish.feature.order.data.remote
 
 import com.wishadish.feature.order.domain.model.Dish
 import com.wishadish.feature.order.domain.model.DishDto
+import com.wishadish.feature.order.domain.model.DishIdCarrier
 import com.wishadish.feature.order.domain.model.Order
 import com.wishadish.feature.order.domain.repository.OrderRepository
 import com.wishadish.network.RetrofitClient
@@ -12,10 +13,12 @@ class RemoteOrderRepository : OrderRepository {
     override suspend fun getDishes(): List<DishDto> {
         //delay(5000)
         //return mockDishes()
+        println("USER: getting dishes without favourites")
         return api.getDishes()
     }
 
     override suspend fun getDishesWithFavourites(token: String): List<DishDto> {
+        println("USER: getting dishes with favourites")
         return api.getDishesWithFavourites(token)
     }
 
@@ -24,7 +27,7 @@ class RemoteOrderRepository : OrderRepository {
     }
 
     override suspend fun addToFavourites(dish: Dish, token: String) {
-        api.addToFavourites(dish.dishId, token)
+        api.addToFavourites(DishIdCarrier(dish.dishId), token)
     }
 
     override suspend fun removeFromFavourites(dish: Dish, token: String) {

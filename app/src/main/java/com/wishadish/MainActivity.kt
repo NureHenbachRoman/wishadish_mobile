@@ -19,6 +19,7 @@ import com.wishadish.feature.auth.presentation.ProfileScreen
 import com.wishadish.feature.auth.presentation.SignUpScreen
 import com.wishadish.feature.order.data.remote.RemoteOrderRepository
 import com.wishadish.feature.order.presentation.CartCheckoutScreen
+import com.wishadish.feature.order.presentation.FavouritesScreen
 import com.wishadish.feature.order.presentation.OrderScreen
 import com.wishadish.feature.order.presentation.OrderViewModel
 import com.wishadish.navigation.Screen
@@ -190,7 +191,12 @@ class MainActivity : ComponentActivity() {
                                     ).show()
                                     navController.navigate(Screen.LoginScreen)
                                 }
-                            }
+                            },
+                            onFavouritesClick = {
+                                orderViewModel.updateSearchQuery("")
+                                navController.navigate(Screen.FavouritesScreen)
+                            },
+                            onHistoryClick = {}
                         )
                     }
                     composable<Screen.CartScreen> {
@@ -218,6 +224,9 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(Screen.OrderScreen)
                             }
                         )
+                    }
+                    composable<Screen.FavouritesScreen> { 
+                        FavouritesScreen(viewModel = orderViewModel)
                     }
                 }
             }

@@ -36,14 +36,25 @@ class OrderViewModel(private val repository: OrderRepository) : ViewModel() {
         private set
 
     init {
+        Firebase.auth.addAuthStateListener {
+            viewModelScope.launch {
+                fetchDishes()
+            }
+        }
         viewModelScope.launch {
             fetchDishes()
         }
     }
 
-    suspend fun fetchDishes() {
+    private suspend fun fetchDishes() {
         try {
-            allDishes = repository.getDishes().map { dto ->
+            println("USER: " + Firebase.auth.currentUser)
+            val dtoList = if (Firebase.auth.currentUser == null)
+                repository.getDishes()
+            else
+                repository.getDishesWithFavourites(Firebase.auth.currentUser!!.getIdToken(false).await().token!!)
+
+            allDishes = dtoList.map { dto ->
                 Dish(
                     dishId = dto.dishId,
                     name = dto.name,
@@ -51,7 +62,7 @@ class OrderViewModel(private val repository: OrderRepository) : ViewModel() {
                     price = dto.price,
                     imageUrl = dto.imageUrl,
                     category = dto.category,
-                    isFavourite = mutableStateOf(dto.isFavourite ?: false)
+                    isFavourite = mutableStateOf(dto.isFavourite)
                 )
             }
             displayedDishes = allDishes
@@ -63,7 +74,7 @@ class OrderViewModel(private val repository: OrderRepository) : ViewModel() {
     }
 
     fun placeOrder(onSuccess: () -> Unit) {
-        var resultPickupDateTime: String?
+        val resultPickupDateTime: String?
         if (customPickupTime.value) {
             val zonedDateTime = pickupDateTime.value.atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneOffset.UTC)
             val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")

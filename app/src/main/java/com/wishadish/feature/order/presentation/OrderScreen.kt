@@ -3,6 +3,7 @@ package com.wishadish.feature.order.presentation
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,6 +49,7 @@ fun OrderScreen(
     onFavouritesClick: () -> Unit,
     onHistoryClick: () -> Unit
 ) {
+    println("USER: Recomposition")
     val filteredDishes = viewModel.displayedDishes
     val categories = viewModel.getAllCategories()
     val context = LocalContext.current
@@ -72,8 +76,30 @@ fun OrderScreen(
             )
         },
         bottomBar = {
-            BottomAppBar {
-
+            BottomAppBar(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    Icon(
+                        modifier = Modifier.size(32.dp).clickable { },
+                        imageVector = Icons.Default.RestaurantMenu,
+                        contentDescription = "Menu"
+                    )
+                    Icon(
+                        modifier = Modifier.size(32.dp).clickable { onFavouritesClick() },
+                        painter = painterResource(R.drawable.heart_filled_icon),
+                        contentDescription = "Favourites"
+                    )
+                    Icon(
+                        modifier = Modifier.size(32.dp).clickable { onHistoryClick() },
+                        imageVector = Icons.Default.History,
+                        contentDescription = "History"
+                    )
+                }
             }
         }
     ){
@@ -157,7 +183,9 @@ fun DishItem(
             Text(text = "%.2f UAH".format(dish.price))
         }
         Column(modifier = Modifier.weight(5f)) {
+            println("USER: $dish")
             if (dish.isFavourite.value != null) {
+                println("USER: Dish recomposed: ${dish.isFavourite.value}")
                 Icon(
                     painter = painterResource(
                         if (dish.isFavourite.value!!) R.drawable.heart_filled_icon
